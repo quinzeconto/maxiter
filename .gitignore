@@ -1,3 +1,2 @@
-.database/
-env.ini/
-.htaccess/
+env.ini
+.htaccess
