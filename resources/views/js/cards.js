@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
     // $.ajax({
-    //     url: "../../../../app/controllers/GetCardsDataController.php",
+    //     url: "",
     //     type: "GET",
     //     success: function (response) {
 
