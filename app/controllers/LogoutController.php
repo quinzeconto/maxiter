@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../models/ResponseModel.php";
+require __DIR__ . "/../models/LoadModel.php";
 require __DIR__ . "/../models/SecureRequestModel.php";
 class LogoutController
 {
