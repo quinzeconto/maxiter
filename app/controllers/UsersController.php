@@ -3,9 +3,9 @@ require __DIR__ . "/../models/LoadModel.php";
 require __DIR__ . "/../models/SecureRequestModel.php";
 
 
-class GetUsersDataController {
+class UsersController {
 
-    public function get() {
+    public function main() {
         
         // Your code here
         $result = DatabaseModel::connection("maxiter")->execute("SELECT * FROM users");
@@ -18,7 +18,9 @@ class GetUsersDataController {
 
     }
 
+
+
 }
 
-$controller = new GetUsersDataController();
-$controller->get();
+$controller = new UsersController();
+(isset($_POST['controller']) && !empty($_POST['controller'])) ? $controller->{$_POST['controller']}() : $controller->main();

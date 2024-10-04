@@ -41,19 +41,18 @@ class DatabaseModel
 
     public static function execute($query, $bindParams = null)
     {
-
         $result = self::$pdo->prepare($query);
 
         if ($bindParams != null) {
             foreach ($bindParams as $key => $value) {
-                $result->bindParam($key, $value);
+                $result->bindValue($key, $value); 
             }
         }
 
         $result->execute();
         return $result;
-
     }
+
 
     public static function pdo()
     {

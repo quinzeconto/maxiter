@@ -1,0 +1,248 @@
+#!/usr/bin/env php
+<?php
+
+class MaxiterConfiguration
+{
+    public function generateController($fileName)
+    {
+        $path = __DIR__ . '/app/controllers/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "The controller file handles user input and interaction. It processes requests,\n" .
+            "invokes business logic, and updates the model as needed.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "require __DIR__ . '/../models/LoadModel.php';\n" .
+            "require __DIR__ . '/../models/SecureRequestModel.php';\n\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public function main() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}\n\n" .
+            "\$controller = new " . ucfirst($fileName) . "();\n" .
+            "(isset(\$_POST['controller']) && !empty(\$_POST['controller'])) ? \$controller->{\$_POST['controller']}() : \$controller->main();\n";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/controllers directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/controllers');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This controller already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Controller $fileName created\n";
+        }
+    }
+
+    public function generatePage($fileName)
+    {
+        $path = __DIR__ . '/resources/views/pages/' . $fileName . '/' . $fileName . ".php";
+        $cssPath = __DIR__ . '/resources/views/pages/' . $fileName . '/css/' . $fileName . '.css';
+        $jsPath = __DIR__ . '/resources/views/pages/' . $fileName . '/js/' . $fileName . '.js';
+
+        // Content to be written to the PHP file
+        $content =
+            "<!-- \n" .
+            "This is your new page, it's already routed in Maxiter application\n" .
+            "and everything you need is included here.\n" .
+            "Happy Coding!\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "-->\n" .
+            '<?php include __DIR__ . "/../_header/header.php"; ?>' . "\n" .
+            "<!-- Page Title -->\n" .
+            '<?php PagesTitleModel::title("Maxiter - ' . ucfirst($fileName) . '"); ?>' . "\n" .
+            '<link rel="stylesheet" href="./resources/views/pages/' . $fileName . '/css/' . $fileName . '.css">' . "\n" .
+            "<!--**********************************\n" .
+            "        Main wrapper start\n" .
+            "***********************************-->\n" .
+            '<div id="main-wrapper">' . "\n" .
+            "\n" .
+            "    <!-- NAVBAR -->\n" .
+            '    <?php include __DIR__ . "/../_navbar/navbar.php"; ?>' . "\n" .
+            "    <!-- NAVBAR -->\n" .
+            "\n" .
+            "    <!-- SIDEBAR -->\n" .
+            '    <?php include __DIR__ . "/../_sidenav/sidenav.php"; ?>' . "\n" .
+            "    <!-- SIDEBAR -->\n" .
+            "\n" .
+            "    <!--**********************************\n" .
+            "            Content body start\n" .
+            "        ***********************************-->\n" .
+            '    <div class="content-body">' . "\n" .
+            "        <!-- row -->\n" .
+            "        <div class=\"container-fluid\">" . "\n" .
+            "\n" .
+            "            <!-- CARDS -->\n" .
+            '            <?php include __DIR__ . "/../_cards/cards.php"; ?>' . "\n" .
+            "            <!-- CARDS -->\n" .
+            "\n" .
+            "            <div class=\"row\">" . "\n" .
+            "                <div class=\"col-xl-12 col-lg-8 col-md-8\">" . "\n" .
+            "                    <div class=\"card\">" . "\n" .
+            "                        <div class=\"card-header\">" . "\n" .
+            "                            <h4 class=\"card-title\"><?= EnvModel::env(\"APP_NAME\") ?> - " . ucfirst($fileName) . "</h4>\n" .
+            "                        </div>" . "\n" .
+            "                        <div class=\"card-body\">" . "\n" .
+            "                            <div class=\"row\">" . "\n" .
+            "                                <div style=\"text-align:justify;\" class=\"col-xl-12 col-lg-8\">" . "\n" .
+            "                                    <!-- CODE HERE HERE -->\n\n" .
+            "                                </div>" . "\n" .
+            "                            </div>" . "\n" .
+            "                        </div>" . "\n" .
+            "                    </div>" . "\n" .
+            "                </div>" . "\n" .
+            "\n" .
+            "            </div>" . "\n" .
+            "\n" .
+            "        </div>" . "\n" .
+            "    </div>" . "\n" .
+            "    <!--**********************************\n" .
+            "            Content body end\n" .
+            "        ***********************************-->\n" .
+            "\n" .
+            "</div>" . "\n" .
+            "<!--**********************************\n" .
+            "        Main wrapper end\n" .
+            "    ***********************************-->" . "\n" .
+            "\n" .
+            '<script src="./resources/views/pages/' . $fileName . '/js/' . $fileName . '.js"></script>' . "\n" .
+            '<?php include __DIR__ . "/../_footer/footer.php"; ?>'
+        ;
+
+        $this->createDirectory(__DIR__ . '/resources');
+        $this->createDirectory(__DIR__ . '/resources/views');
+        $this->createDirectory(__DIR__ . '/resources/views/pages');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/css/');
+        $this->createDirectory(__DIR__ . '/resources/views/pages/' . $fileName . '/js/');
+
+        // Check if the PHP file already exists
+        if (file_exists($path)) {
+            echo "This page already exists\n";
+        } else {
+            // Create the PHP file and write the content
+            file_put_contents($path, $content);
+            echo "Page $fileName created\n";
+        }
+
+        // Content for the CSS file
+        $cssContent = "/* Styles for $fileName page */\n";
+        file_put_contents($cssPath, $cssContent);
+        echo "CSS file $fileName.css created\n";
+
+        // Content for the JS file
+        $jsContent = "// JavaScript for $fileName page\n";
+        file_put_contents($jsPath, $jsContent);
+        echo "JS file $fileName.js created\n";
+    }
+
+    public function generateModel($fileName)
+    {
+        $path = __DIR__ . '/app/models/' . $fileName . ".php";
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "The model represents the application's data and business logic. It manages data retrieval, \n" .
+            "storage, and manipulation, often interacting with the database. \n" .
+            "The model encapsulates rules and validation to ensure data integrity.\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "class " . ucfirst($fileName) . " {\n\n" .
+            "    public static function main() {\n" .
+            "        // Your code here\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/models');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This model already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Model $fileName created\n";
+        }
+    }
+
+    public function generateLogModel($database)
+    {
+        $path = __DIR__ . '/app/models/LogModel.php';
+
+        // Content to be written to the file
+        $content = "<?php\n" .
+            "/*\n" .
+            "This is the log file, use it statically where you want using LogModel::log(\"Your log text here\")\n" .
+            "\n" .
+            "@author Victor Béser\n" .
+            "*/\n" .
+            "class LogModel {\n\n" .
+            "    private static \$log;\n" .
+            "    public static function log(\$log) {\n" .
+            "        \$currentDateTime = new DateTime();\n" .
+            "        \$formattedDateTime = \$currentDateTime->format('Y-m-d H:i:s');\n\n" .
+            "        self::\$log = mb_strtoupper(\$log);\n\n" .
+            "        \$query = \"INSERT INTO logs (log, date_created) VALUES (:log, :date)\";\n" .
+            "        \$result = DatabaseModel::connection(\"$database\")->execute(\$query, [\n" .
+            "            \":log\" => self::\$log,\n" .
+            "            \":date\" => \$formattedDateTime,\n" .
+            "        ]);\n" .
+            "    }\n\n" .
+            "}";
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/app/models');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This model already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "LogModel with database '$database' created\n";
+        }
+    }
+
+    private function createDirectory($dir)
+    {
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
+    }
+}
+
+// Check if arguments were passed
+if ($argc < 4) {
+    echo "Command not found\n";
+    exit(1);
+}
+
+// Instantiate the MaxiterConfiguration class
+$config = new MaxiterConfiguration();
+
+// Check if the second argument is 'new' and the third is 'controller'
+if ($argv[1] === 'new' && $argv[2] === 'controller') {
+    $config->generateController($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'model') {
+    $config->generateModel($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'view') {
+    $config->generatePage($argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'log') {
+    $config->generateLogModel($argv[3]);
+} else {
+    echo "Command not found\n";
+}
