@@ -35,34 +35,31 @@
                             <h4 class="card-title"><?= EnvModel::env("APP_NAME") ?> - List Example
                             </h4>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div style="text-align:justify;" class="col-xl-12 col-lg-8">
-                                    <!-- CODE HERE HERE -->
-                                    <table class="professional-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Username</th>
-                                                <th>E-mail</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody-table">
-                                            <!-- <tr>
-                                                <td>John Doe</td>
-                                                <td>Project Manager overseeing the development team.</td>
-                                                <td>2024-01-15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Jane Smith</td>
-                                                <td>Lead Designer responsible for UI/UX design.</td>
-                                                <td>2024-02-20</td>
-                                            </tr> -->
-                                        </tbody>
+                        <div class="card-body" id="table-container">
 
-                                    </table>
-                                </div>
-                            </div>
+                            <!-- CODE HERE HERE -->
+                            <table class="professional-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>E-mail</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-table">
+                                    <!-- <tr>
+                                        <td>John Doe</td>
+                                        <td>Project Manager overseeing the development team.</td>
+                                        <td>2024-01-15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jane Smith</td>
+                                        <td>Lead Designer responsible for UI/UX design.</td>
+                                        <td>2024-02-20</td>
+                                    </tr> -->
+                                </tbody>
+
+                            </table>
                         </div>
                     </div>
                 </div>

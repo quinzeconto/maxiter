@@ -1,3 +1,7 @@
+#table-container {
+    overflow: auto;
+}
+
 .professional-table {
     width: 100%;
     border-collapse: collapse;
