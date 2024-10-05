@@ -399,7 +399,8 @@ if ($argc < 2) {
     "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
     "php maxiter new model              #Create a new model file in /app/models/\n" .
     "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
-    "php maxiter new log                #Create a basic LogModel to use in your application\n\n"
+    "php maxiter new log                #Create a basic LogModel to use in your application\n\n" . 
+    "php maxiter new table              #Create a SQL file in /src/tables/\n\n"
     ;
 
     exit(1);
@@ -410,10 +411,22 @@ $config = new MaxiterConfiguration();
 
 // Check if the second argument is 'new' and the third is 'controller'
 if ($argv[1] === 'new' && $argv[2] === 'controller') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new controller [controller_name]";
+        exit();
+    }
     $config->generateController($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'model') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new model [model_name]";
+        exit();
+    }
     $config->generateModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'view') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new view [view_name]";
+        exit();
+    }
     $config->generatePage($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
 
@@ -423,6 +436,10 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     }
     $config->generateLogModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'table') {
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new table [table_name]";
+        exit();
+    }
     $config->generateSQL($argv[3]);
 } else {
     echo "Command not found\n";
