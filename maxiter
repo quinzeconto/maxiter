@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-require __DIR__ . "/app/models/LoadModel.php";
+// require __DIR__ . "/app/models/LoadModel.php";
 
 class MaxiterConfiguration
 {
@@ -182,6 +182,11 @@ class MaxiterConfiguration
     {
         $path = __DIR__ . '/app/models/LogModel.php';
 
+        if(!isset($database) || empty($database)) {
+            echo "Error: php maxiter new log [database]";
+            exit();
+        }
+
         // Content to be written to the file
         $content = "<?php\n" .
             "/*\n" .
@@ -195,7 +200,7 @@ class MaxiterConfiguration
             "        \$currentDateTime = new DateTime();\n" .
             "        \$formattedDateTime = \$currentDateTime->format('Y-m-d H:i:s');\n\n" .
             "        self::\$log = mb_strtoupper(\$log);\n\n" .
-            "        \$query = \"INSERT INTO logs (log, date_created) VALUES (:log, :date)\";\n" .
+            "        \$query = \"INSERT INTO logs (log, created_at) VALUES (:log, :date)\";\n" .
             "        \$result = DatabaseModel::connection(\"$database\")->execute(\$query, [\n" .
             "            \":log\" => self::\$log,\n" .
             "            \":date\" => \$formattedDateTime,\n" .
@@ -249,6 +254,22 @@ class MaxiterConfiguration
                 "('alice', MD5('alicepassword'), 'alice@example.com', 'Alice', 'Smith', '1112223333', '789 Maple Ave', 'Sometown', 'Somestate', '67890', 'USA'),\n" .
                 "('bob', MD5('bobpassword'), 'bob@example.com', 'Bob', 'Johnson', '4445556666', '321 Oak St', 'Differenttown', 'Differentstate', '09876', 'USA');";
                 break;
+
+            case 'logs':
+                $content = "-- Create the logs table\n" .
+                "CREATE TABLE logs (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    log TEXT NOT NULL,\n" . 
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the logs table\n" .
+                "INSERT INTO logs (log) VALUES\n" .
+                "('User johndoe logged in successfully'),\n" .
+                "('User janedoe attempted to access restricted area'),\n" .
+                "('User alice updated profile information'),\n" .
+                "('User bob logged out');";
+                break;
+                
         
             case 'products':
                 $content = "-- Create the products table\n" .
@@ -395,6 +416,11 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
 } else if ($argv[1] === 'new' && $argv[2] === 'view') {
     $config->generatePage($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
+
+    if(!isset($argv[3]) || empty($argv[3])) {
+        echo "Error: php maxiter new log [database]";
+        exit();
+    }
     $config->generateLogModel($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'table') {
     $config->generateSQL($argv[3]);
