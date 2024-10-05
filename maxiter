@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+// require __DIR__ . "/app/models/LoadModel.php";
 
 class MaxiterConfiguration
 {
@@ -217,6 +218,61 @@ class MaxiterConfiguration
         }
     }
 
+    public function populateDatabase($database, $table) {
+        // Create a PDO instance
+        try {
+            $env = parse_ini_file(__DIR__ . "/env.ini", true);
+            $driver = $env[$database]["DRIVER"];
+            $port = $env[$database]["PORT"];
+            $host = $env[$database]["HOST"];
+            $username = $env[$database]["USER"];
+            $password = $env[$database]["PASS"];
+            $dsn = "$driver:host=$host;port=$port;dbname=$database;charset=utf8mb4";
+            $pdo = new PDO($dsn, $username, $password);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            $createTableSQL = null; 
+            switch ($table) {
+                case 'users':
+                    // Create the table if it doesn't exist
+                    $createTableSQL = "CREATE TABLE IF NOT EXISTS $table (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(100) NOT NULL,
+                        email VARCHAR(255) NOT NULL UNIQUE,
+                        password VARCHAR(255) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )";
+                    $pdo->exec($createTableSQL);
+    
+                    $insertSQL = "INSERT INTO $table (name, email, password) VALUES (:name, :email, :password)";
+                    $stmt = $pdo->prepare($insertSQL);
+                    
+                    // Example data
+                    $users = [
+                        ['name' => 'Alice', 'email' => 'alice@example.com', 'password' => md5('password123')],
+                        ['name' => 'Bob', 'email' => 'bob@example.com', 'password' => md5('password123')],
+                        ['name' => 'Charlie', 'email' => 'charlie@example.com', 'password' => md5('password123')]
+                    ];
+    
+                    foreach ($users as $user) {
+                        $stmt->execute([
+                            ':name' => $user['name'],
+                            ':email' => $user['email'],
+                            ':password' => $user['password']
+                        ]);
+                    }
+                    echo "Table '$table' created and populated successfully.";
+                    break;
+    
+            }
+    
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+    
+
     private function createDirectory($dir)
     {
         if (!file_exists($dir)) {
@@ -226,8 +282,17 @@ class MaxiterConfiguration
 }
 
 // Check if arguments were passed
-if ($argc < 4) {
-    echo "Command not found\n";
+if ($argc < 2) {
+    
+    echo 
+    "\nMaxiter CLI usage\n" .
+    "\n" .    
+    "php maxiter new controller         #Create a new controller file in /app/controllers/\n" .
+    "php maxiter new model              #Create a new model file in /app/models/\n" .
+    "php maxiter new view               #Create a new view folder and files in /resources/views/pages/\n" .
+    "php maxiter new log                #Create a basic LogModel to use in your application\n\n"
+    ;
+
     exit(1);
 }
 
@@ -243,6 +308,8 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     $config->generatePage($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
     $config->generateLogModel($argv[3]);
+} else if ($argv[1] === 'populate') {
+    $config->populateDatabase($argv[2], $argv[3]);
 } else {
     echo "Command not found\n";
 }
