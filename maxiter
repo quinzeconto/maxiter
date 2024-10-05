@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-// require __DIR__ . "/app/models/LoadModel.php";
+require __DIR__ . "/app/models/LoadModel.php";
 
 class MaxiterConfiguration
 {
@@ -218,60 +218,148 @@ class MaxiterConfiguration
         }
     }
 
-    public function populateDatabase($database, $table) {
-        // Create a PDO instance
-        try {
-            $env = parse_ini_file(__DIR__ . "/env.ini", true);
-            $driver = $env[$database]["DRIVER"];
-            $port = $env[$database]["PORT"];
-            $host = $env[$database]["HOST"];
-            $username = $env[$database]["USER"];
-            $password = $env[$database]["PASS"];
-            $dsn = "$driver:host=$host;port=$port;dbname=$database;charset=utf8mb4";
-            $pdo = new PDO($dsn, $username, $password);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            $createTableSQL = null; 
-            switch ($table) {
-                case 'users':
-                    // Create the table if it doesn't exist
-                    $createTableSQL = "CREATE TABLE IF NOT EXISTS $table (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(100) NOT NULL,
-                        email VARCHAR(255) NOT NULL UNIQUE,
-                        password VARCHAR(255) NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    )";
-                    $pdo->exec($createTableSQL);
-    
-                    $insertSQL = "INSERT INTO $table (name, email, password) VALUES (:name, :email, :password)";
-                    $stmt = $pdo->prepare($insertSQL);
-                    
-                    // Example data
-                    $users = [
-                        ['name' => 'Alice', 'email' => 'alice@example.com', 'password' => md5('password123')],
-                        ['name' => 'Bob', 'email' => 'bob@example.com', 'password' => md5('password123')],
-                        ['name' => 'Charlie', 'email' => 'charlie@example.com', 'password' => md5('password123')]
-                    ];
-    
-                    foreach ($users as $user) {
-                        $stmt->execute([
-                            ':name' => $user['name'],
-                            ':email' => $user['email'],
-                            ':password' => $user['password']
-                        ]);
-                    }
-                    echo "Table '$table' created and populated successfully.";
-                    break;
-    
-            }
-    
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+    public function generateSQL($table) {
+
+        $path = __DIR__ . '/src/tables/'.$table.'.sql';
+
+        switch($table) {
+
+            case 'users':
+                $content = "-- Create the users table\n" .
+                "CREATE TABLE users (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    username VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    password VARCHAR(255) NOT NULL,\n" .
+                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                "    first_name VARCHAR(50),\n" .
+                "    last_name VARCHAR(50),\n" .
+                "    phone_number VARCHAR(15),\n" .
+                "    address VARCHAR(255),\n" .
+                "    city VARCHAR(50),\n" .
+                "    state VARCHAR(50),\n" .
+                "    zip_code VARCHAR(10),\n" .
+                "    country VARCHAR(50),\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the users table\n" .
+                "INSERT INTO users (username, password, email, first_name, last_name, phone_number, address, city, state, zip_code, country) VALUES\n" .
+                "('johndoe', MD5('password123'), 'johndoe@example.com', 'John', 'Doe', '1234567890', '123 Main St', 'Anytown', 'Anystate', '12345', 'USA'),\n" .
+                "('janedoe', MD5('mypassword'), 'janedoe@example.com', 'Jane', 'Doe', '0987654321', '456 Elm St', 'Othertown', 'Otherstate', '54321', 'USA'),\n" .
+                "('alice', MD5('alicepassword'), 'alice@example.com', 'Alice', 'Smith', '1112223333', '789 Maple Ave', 'Sometown', 'Somestate', '67890', 'USA'),\n" .
+                "('bob', MD5('bobpassword'), 'bob@example.com', 'Bob', 'Johnson', '4445556666', '321 Oak St', 'Differenttown', 'Differentstate', '09876', 'USA');";
+                break;
+        
+            case 'products':
+                $content = "-- Create the products table\n" .
+                "CREATE TABLE products (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    name VARCHAR(100) NOT NULL,\n" .
+                "    description TEXT,\n" .
+                "    price DECIMAL(10, 2) NOT NULL,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the products table\n" .
+                "INSERT INTO products (name, description, price) VALUES\n" .
+                "('Product 1', 'Description for Product 1', 19.99),\n" .
+                "('Product 2', 'Description for Product 2', 29.99),\n" .
+                "('Product 3', 'Description for Product 3', 39.99),\n" .
+                "('Product 4', 'Description for Product 4', 49.99);";
+                break;
+        
+            case 'orders':
+                $content = "-- Create the orders table\n" .
+                "CREATE TABLE orders (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    user_id INT NOT NULL,\n" .
+                "    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    status VARCHAR(50) NOT NULL,\n" .
+                "    total DECIMAL(10, 2) NOT NULL,\n" .
+                "    FOREIGN KEY (user_id) REFERENCES users(id)\n" .
+                ");\n\n" .
+                "-- Insert data into the orders table\n" .
+                "INSERT INTO orders (user_id, status, total) VALUES\n" .
+                "(1, 'Pending', 59.98),\n" .
+                "(2, 'Completed', 29.99),\n" .
+                "(1, 'Shipped', 39.99),\n" .
+                "(3, 'Cancelled', 19.99);";
+                break;
+        
+            case 'customers':
+                $content = "-- Create the customers table\n" .
+                "CREATE TABLE customers (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    name VARCHAR(100) NOT NULL,\n" .
+                "    email VARCHAR(100) NOT NULL UNIQUE,\n" .
+                "    phone_number VARCHAR(15),\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the customers table\n" .
+                "INSERT INTO customers (name, email, phone_number) VALUES\n" .
+                "('Alice Smith', 'alice@example.com', '1234567890'),\n" .
+                "('Bob Johnson', 'bob@example.com', '0987654321'),\n" .
+                "('Charlie Brown', 'charlie@example.com', '5551234567'),\n" .
+                "('Diana Prince', 'diana@example.com', '4449876543');";
+                break;
+        
+            case 'roles':
+                $content = "-- Create the roles table\n" .
+                "CREATE TABLE roles (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    role_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the roles table\n" .
+                "INSERT INTO roles (role_name) VALUES\n" .
+                "('Admin'),\n" .
+                "('Editor'),\n" .
+                "('Viewer'),\n" .
+                "('Guest');";
+                break;
+        
+            case 'permissions':
+                $content = "-- Create the permissions table\n" .
+                "CREATE TABLE permissions (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY,\n" .
+                "    permission_name VARCHAR(50) NOT NULL UNIQUE,\n" .
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" .
+                "    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n" .
+                ");\n\n" .
+                "-- Insert data into the permissions table\n" .
+                "INSERT INTO permissions (permission_name) VALUES\n" .
+                "('Create'),\n" .
+                "('Read'),\n" .
+                "('Update'),\n" .
+                "('Delete');";
+                break;
+        
+            default:
+                $content = "-- Create the $table table\n" .
+                "CREATE TABLE $table (\n" .
+                "    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL\n" .
+                ");";
+                break;
         }
+        
+
+        // Create the /app directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/src');
+        // Create the /app/models directory if it doesn't exist
+        $this->createDirectory(__DIR__ . '/src/tables');
+
+        // Check if the file already exists
+        if (file_exists($path)) {
+            echo "This table already exists\n";
+        } else {
+            // Create the file and write the content
+            file_put_contents($path, $content);
+            echo "Table '$table' created in path /src/tables/\n";
+        }
+
     }
-    
 
     private function createDirectory($dir)
     {
@@ -308,8 +396,8 @@ if ($argv[1] === 'new' && $argv[2] === 'controller') {
     $config->generatePage($argv[3]);
 } else if ($argv[1] === 'new' && $argv[2] === 'log') {
     $config->generateLogModel($argv[3]);
-} else if ($argv[1] === 'populate') {
-    $config->populateDatabase($argv[2], $argv[3]);
+} else if ($argv[1] === 'new' && $argv[2] === 'table') {
+    $config->generateSQL($argv[3]);
 } else {
     echo "Command not found\n";
 }

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let tr = document.createElement("tr");
 
                 let td_name = document.createElement("td");
-                td_name.innerText = item.name;
+                td_name.innerText = item.last_name;
                 let td_username = document.createElement("td");
                 td_username.innerText = item.username; 
                 let td_email = document.createElement("td");
