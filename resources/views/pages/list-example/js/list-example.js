@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Home JS");
+    console.log("List Example");
     $.ajax({
         url: "./app/controllers/UsersController.php",
         type: "GET",
         success: function (response) {
+            let tbody_table = document.querySelector("#tbody-table");
+            tbody_table.innerHTML = "";
 
             let responseFetch = JSON.parse(response);
             responseFetch.data.forEach((item) => {
-
-                let tbody_table = document.querySelector("#tbody-table");
-                tbody_table.innerHTML = "";
                 
                 let tr = document.createElement("tr");
 
