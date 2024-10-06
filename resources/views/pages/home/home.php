@@ -99,7 +99,7 @@
                                     <p>Let us show you a little bit about the files of Maxiter:</p>
 
                                     <p>
-                                        <strong>.database</strong> you will find a database.sql example for this
+                                        <strong>/src/tables/</strong> you will find some SQL example for this
                                         template.
 
                                     </p>
